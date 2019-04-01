@@ -1,21 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>首页</title>
+    <style>
+        .fileImg{
+            width: 225px;
+            border:2px solid rgb(235,235,235);
+            position: relative;
+            display: inline-block;
+            margin-right: 20px;
+            padding-bottom: 2px;
+        }
+        .fileImg div{
+            width: 100%;
+            min-height: 285px;
+            text-align: center;
+
+        }
+        .fileImg .addImg{
+            background: url("static/img/add.png") no-repeat center center;
+            background-size: 30px;
+        }
+        .fileImg label{
+            position: absolute;
+            top: 52%;
+            display: block;
+            text-align: center;
+            width: 100%;
+            font-size: 26px;
+            font-family: 微软雅黑;
+        }
+        .fileImg div img{
+            width: 100%;
+        }
+        .fileImg a{
+            position: absolute;
+            left: -2px;
+            bottom: -60px;
+            display: inline-block;
+            width: 100%;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            border: 2px solid rgb(235,235,235);
+            cursor:pointer;
+            text-decoration: none;
+            color: #000 !important;
+        }
+        #photoForm{
+            text-align: center;
+        }
+        .loadTitle{
+            text-align: center;color: rgb(255,6,1);font-size: 50px;
+        }
+        .bottom_ {
+            text-align: center;
+            color: #000000;
+            font-size: 14px;
+            width: 100%;
+            /*margin-top: 60px;*/
+            position: fixed;
+            bottom: 5px;
+        }
+        a{
+            text-decoration: none !important;
+        }
+        form>span{
+            width: 380px;
+            display: inline-block;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-    图片回显：
-    <div style="color: red;width: 200px;height: 200px;border: 1px solid black;">
+    <h1 class="loadTitle">智慧猫照片处理系统</h1>
+    <form id="photoForm">
+        <span><font style="color: red;">注1：</font>照片背景底色限制白底</span><br>
+        <span><font style="color: red;">注2：</font>处理后照片像素变更为219*413</span><br>
+        <span><font style="color: red;">注3：</font>处理后照片大小变更为200KB以下</span><br><br>
+        <div style="text-align: center;">
+            <div class="fileImg" id="clickImgFile">
+                <div class="addImg">
+                    <img id="sImg"  />
+                </div>
+                <label id="addStr">照片添加</label>
+                <span>处理前</span>
+            </div>
 
-    </div>
-    <form action="/upload" method="post" enctype="multipart/form-data" >
-        图片上传：<input type="file" accept=".jpg" name="photo">
-        <input type="submit" value="上传">
+            <div class="fileImg">
+                <div>
+                    <img id="fImg"/>
+                </div>
+                <span>处理后</span>
+                <a href="javascript:void(this);" id="btn">保存图片</a>
+            </div>
+        </div>
+
+        <input id="imgFile" style="display: none;" type="file" accept=".jpg" name="photo">
     </form>
-
+    <div class="bottom_" id="bottom">
+      <!--  <div style="color: #4c4c4c;font-size: 12px;line-height: 1.5;">主办：中共绵阳市委组织部</div>-->
+        <div style="color: #4c4c4c;font-size: 12px;line-height: 1.5;">技术支持： <a href="http://www.kafeikeji.com" target="_Blank" style="color: #4c4c4c;font-size: 12px;">四川咖菲科技有限公司</a> </div>
+    </div>
 </body>
+<script type="text/javascript" th:src="@{/static/jquery-2.1.4.min.js}" ></script>
 <script type="text/javascript">
+    function upload() {
+        var formData = new FormData($("#photoForm")[0]);
+        var file=$("#imgFile").val();
+        if(file == "" ){
+            alert("未选择文件..");
+            return;
+        }
+        $.ajax({
+            url:'/upload',
+            processData : false,
+            contentType : false,
+            async:false,
+            type:'post',
+            data: formData,
+            dataType:'json',
+            success:function (data) {
+                if(data.success) {
+                    alert(data.message);
+                    $("#addStr").hide();
+                    $('#sImg').attr("src",data.data.split(",")[0]);
+                    $('#fImg').attr("src",data.data.split(",")[1]);
+                }else{
+                    alert(data.message);
+                }
+            }
+        });
+    }
+    //10.
+    $("#clickImgFile").click(function(){
+        $("#imgFile").click();
 
+    });
+    $("#imgFile").change(function () {
+        upload();
+    });
+    $("#btn").click(function(){
+        var path = $('#fImg').attr("src");
+        if(!path) {
+            alert('未生成图片');
+            return;
+        }
+        window.location.href="/downLoad?path="+path;
+    });
 </script>
 </html>
