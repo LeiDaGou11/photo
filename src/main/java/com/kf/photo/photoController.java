@@ -1,5 +1,8 @@
 package com.kf.photo;
 
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGEncodeParam;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -63,7 +66,7 @@ public class photoController {
                 fileItem.write(saveFile);
 
                 //改变长宽
-                Thumbnails.of(savePath).size(295, 413).keepAspectRatio(false).toFile("D:/home/share2/" + fileItem.getName());
+                Thumbnails.of(savePath).size(437, 614).keepAspectRatio(false).toFile("D:/home/share2/" + fileItem.getName());
                 //改变大小
                 File tempFile = new File("D:/home/share2/" + fileItem.getName());
                 double scale = 1.0d ;
@@ -71,6 +74,8 @@ public class photoController {
                     scale = (200*1024f) / fileItem.getSize() ;
                     Thumbnails.of("D:/home/share2/" + fileItem.getName()).scale(1f).outputQuality(scale).outputFormat("jpg").toFile("D:/home/share2/"+fileItem.getName());
                 }
+
+                handleDpi(new File("D:/home/share2/" + fileItem.getName()), 300, 300);
 
 
                 String accessPath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()
@@ -122,6 +127,23 @@ public class photoController {
             ex.printStackTrace();
         }
         //return response;
+    }
+
+    public static void handleDpi(File file, int xDensity, int yDensity) {
+        try {
+            BufferedImage image = ImageIO.read(file);
+            JPEGImageEncoder jpegEncoder = JPEGCodec.createJPEGEncoder(new FileOutputStream(file));
+            JPEGEncodeParam jpegEncodeParam = jpegEncoder.getDefaultJPEGEncodeParam(image);
+            jpegEncodeParam.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
+            jpegEncoder.setJPEGEncodeParam(jpegEncodeParam);
+            jpegEncodeParam.setQuality(0.75f, false);
+            jpegEncodeParam.setXDensity(xDensity);
+            jpegEncodeParam.setYDensity(yDensity);
+            jpegEncoder.encode(image, jpegEncodeParam);
+            image.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

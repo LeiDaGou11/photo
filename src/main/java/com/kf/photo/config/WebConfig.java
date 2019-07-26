@@ -9,6 +9,7 @@ public class WebConfig  extends WebMvcConfigurationSupport {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/favicon.ico");
         registry.addResourceHandler("/file/**").addResourceLocations("file:D:/home/share/");
         registry.addResourceHandler("/file2/**").addResourceLocations("file:D:/home/share2/");
     }
